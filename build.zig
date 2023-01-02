@@ -16,7 +16,7 @@ const BuildOptions = struct {
 };
 
 pub fn staticLib(b: *std.build.Builder, opts: BuildOptions) *std.build.LibExeObjStep {
-    const lib = b.addStaticLibrary("rlImGui", relpath("rlImGui.cpp"));
+    const lib = b.addStaticLibrary("rlImGui", null);
     if (opts.disable_obsolete_keyio) lib.defineCMacro("IMGUI_DISABLE_OBSOLETE_KEYIO", null);
     if (opts.disable_obsolete_functions) lib.defineCMacro("IMGUI_DISABLE_OBSOLETE_FUNCTIONS", null);
 
@@ -24,7 +24,20 @@ pub fn staticLib(b: *std.build.Builder, opts: BuildOptions) *std.build.LibExeObj
     lib.addIncludePath(relpath("."));
     lib.addIncludePath(opts.calc_raylib_path(b.allocator));
     lib.addIncludePath(opts.imgui_repo_path orelse relpath("imgui"));
+    lib.addCSourceFile(relpath("rlImGui.cpp"), &.{});
     return lib;
+}
+
+/// Add source
+pub fn add(b: *std.build.Builder, exe: *std.build.LibExeObjStep, opts: BuildOptions) void {
+//     lib.linkLibCpp();
+//     lib.addIncludePath(relpath("."));
+    if (opts.disable_obsolete_keyio) exe.defineCMacro("IMGUI_DISABLE_OBSOLETE_KEYIO", null);
+    if (opts.disable_obsolete_functions) exe.defineCMacro("IMGUI_DISABLE_OBSOLETE_FUNCTIONS", null);
+
+    exe.addIncludePath(opts.calc_raylib_path(b.allocator));
+    exe.addIncludePath(opts.imgui_repo_path orelse relpath("imgui"));
+    exe.addCSourceFile(relpath("rlImGui.cpp"), &.{});
 }
 
 pub fn addPackage(b: *std.build.Builder, exe: *std.build.LibExeObjStep, name: []const u8, opts: BuildOptions) void {
