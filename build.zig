@@ -7,6 +7,8 @@ pub fn relpath(comptime path: []const u8) []const u8 {
 const BuildOptions = struct {
     raylib_repo_path: ?[]const u8 = null,
     imgui_repo_path: ?[]const u8 = null,
+    disable_obsolete_keyio: bool = false,
+    disable_obsolete_functions: bool = false,
 
     fn calc_raylib_path(opts: @This(), al: std.mem.Allocator) []const u8 {
         return std.fmt.allocPrint(al, "{s}" ++ std.fs.path.sep_str ++ "src", .{opts.raylib_repo_path orelse relpath("raylib")}) catch unreachable;
@@ -15,6 +17,9 @@ const BuildOptions = struct {
 
 pub fn staticLib(b: *std.build.Builder, opts: BuildOptions) *std.build.LibExeObjStep {
     const lib = b.addStaticLibrary("rlImGui", relpath("rlImGui.cpp"));
+    if (opts.disable_obsolete_keyio) lib.defineCMacro("IMGUI_DISABLE_OBSOLETE_KEYIO", null);
+    if (opts.disable_obsolete_functions) lib.defineCMacro("IMGUI_DISABLE_OBSOLETE_FUNCTIONS", null);
+
     lib.linkLibCpp();
     lib.addIncludePath(relpath("."));
     lib.addIncludePath(opts.calc_raylib_path(b.allocator));
