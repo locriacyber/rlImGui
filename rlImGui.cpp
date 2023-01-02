@@ -125,11 +125,7 @@ static void rlImGuiNewFrame()
 }
 
 static void SetKeyDown(ImGuiIO& io, KeyboardKey rlkey, ImGuiKey imkey) {
-#ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
     io.KeysData[ImGui::GetKeyIndex(imkey)].Down = IsKeyDown(rlkey);
-#else
-    io.KeysDown[imkey] = IsKeyDown(rlkey);
-#endif
 }
 
 static void SetAllKeyDown(ImGuiIO& io) {
@@ -444,11 +440,11 @@ void rlImGuiImage(const Texture *image)
     ImGui::Image((ImTextureID)image, ImVec2(float(image->width), float(image->height)));
 }
 
-// #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
-// bool rlImGuiImageButton(const Texture *image) {
-//     return ImGui::ImageButton((ImTextureID)image, ImVec2(float(image->width), float(image->height)));
-// }
-// #endif
+#ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
+bool rlImGuiImageButton(const Texture *image) {
+    return ImGui::ImageButton((ImTextureID)image, ImVec2(float(image->width), float(image->height)));
+}
+#endif
 
 void rlImGuiImageSize(const Texture *image, int width, int height)
 {
